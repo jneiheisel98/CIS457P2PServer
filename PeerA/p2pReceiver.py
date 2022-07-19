@@ -9,8 +9,8 @@ print ("\n Receiver is coming up. \n\n To use FTP, connect a server.")
 
 #basic server info
 client_ip = 'localhost'
-client_port = 3377
-sendRecv_port = 3378
+client_port = 3379
+sendRecv_port = 3380
 buffer_size = 1024
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sendRecv_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -57,7 +57,7 @@ def retr(fileName, ip, port):
             send_socket.connect((ip, int(port)))
             print(ip)
             print(port)
-            client_socket.send(fileData)
+            send_socket.send(fileData)
         else: 
             print("sendOther")
             send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

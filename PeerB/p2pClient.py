@@ -11,21 +11,20 @@ print ("\n Client is coming up. \n\n To use FTP, connect a client.")
 
 #basic server info
 client_ip = 'localhost'
-client_port = random.randint(3377,9999)
-sendRecv_port = random.randint(3377,9999)
-explore_port = random.randint(3377,9999)
-explore_recv_port = random.randint(3377,9999)
+client_port = random.randint(3390,9999)
+sendRecv_port = random.randint(3390,9999)
+explore_port = random.randint(3390,9999)
 buffer_size = 1024
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sendRecv_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sendRecv_socket.bind((client_ip, sendRecv_port))
 sendRecv_socket.listen()
 explore_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-explore_socket.bind((client_ip, explore_port))
-explore_socket.listen()
-explore_receiver= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-explore_receiver.bind((client_ip, explore_recv_port))
-explore_receiver.listen()
+recv_socket =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+recv_socket.bind((client_ip, explore_port))
+recv_socket.listen()
+
+
 print("\nClient is up")
 def retr(fileName):
     files = [f for f in os.listdir('.') if os.path.isfile(f)]
@@ -93,7 +92,7 @@ def connect():
         print(ack)
         
         prompt = input("\nEnter Username, speed, internet medium: ")
-        prompt+= " "+str("3880")
+        prompt+= " "+str("3378")
         client_socket.send(prompt.encode())
         time.sleep(4)
         filePrompt = client_socket.recv(buffer_size).decode()
@@ -132,30 +131,39 @@ def get(otherIP, otherPort, fileName):
     explore_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     explore_socket.connect((otherIP, int(otherPort)))
     time.sleep(4)
-    sendState = "RETR "+ fileName + " " + str(otherIP) + " " + str(explore_recv_port)
+    sendState = "RETR "+ fileName + " " + str(client_ip) + " " + str(explore_port)
     explore_socket.send(sendState.encode())
-    connected_socket, addr = explore_receiver.accept()
-    nextSteps = connected_socket.recv(buffer_size).decode()
     extension = fileName.split(".")
-    print(nextSteps)
+    filename = fileName
+    connected_socket, addr = recv_socket.accept()
+    content = connected_socket.recv(buffer_size)
+    print(content)
     try:
         #final check
-        connected_socket.send("1")
+        print("in final check")
+        explore_socket.send("1")
         return
     except:
         print ("couldn't get final server confirmation")
     try:
-        while nextSteps:
-            with open(fileName, "a") as file:
-                file.write(str(nextSteps))
-                nextSteps = connected_socket.recv(buffer_size).decode('utf-8')
-                file.close()
-        print("file read")
+        while content:
+            if extension[1]== "jpg" or extension[1]== "png" or  extension[1]== "pdf" or extension[    1]== "mp4" or  extension[1]== "eps" or extension[1]== "ai" or extension[1]== "doc" or extension[1]== "docx" or extension[1]== "ppt" or extension[1]== "pptx":
+                with open(filename, "ab") as file:
+                    
+                    binCont = bytearray(content)
+                    file.write(binCont)
+                    content = connected_socket.recv(buffer_size)
+            else:
+                with open(filename, "a") as file:
+                    content = content.decode()
+                    file.write(content)
+                    content = connected_socket.recv(buffer_size)
+            file.close()
     except: 
-    	print("before except")
-    	if not file.closed:
+        if not file.closed:
             file.close
-    connected_socket.close()        
+    connected_socket.close()
+        
 #automatic prompting menu for the client
 print("\nWelcome to the FTP Client. Call one of the following functions:")
 print("\n\nClient is online: Welcome!\n\n")

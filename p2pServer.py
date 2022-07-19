@@ -74,7 +74,7 @@ def promptCommandReceiver(connection_socket):
                        time.sleep(3)
                        connection_socket.send(ack.encode())
                        index = len(serverIP)
-                       serverIP.insert(index, addr[0])
+                       serverIP.insert(index, addr[1])
                        print("connection address")
                        print(addr[0])
                        
@@ -84,8 +84,12 @@ def promptCommandReceiver(connection_socket):
                        username.insert(index, inWorkParts[0])
                        connectionSpeed.insert(index, inWorkParts[1])
                        medium.insert(index, inWorkParts[2])
-                       serverPort.insert(index, inWorkParts[3])
+                       serverPort.insert(index, addr[1])
                        print(inWorkParts)
+                       print(username)
+                       print(connectionSpeed)
+                       print(medium)
+                       print(serverPort)
                       
                        ack = "Upload file descriptions"
                        connection_socket.send(ack.encode())
