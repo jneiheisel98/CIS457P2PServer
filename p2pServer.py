@@ -137,16 +137,17 @@ def search(term):
                 #print("find data")
                 if dat.find(tempTerm) != -1 and count !=0 and count %2 !=0:
                     fileName = data[count-1]
-                    returnState = str(serverGotIP) + " " + str(serverGotPort) + " " + fileName        
+                    returnState = returnState + str(serverGotIP) + " " + str(serverGotPort) + " " + fileName        
                     print(returnState)
-                    send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    print(server_ip)
-                    print(params[1])                    
-                    send_socket.connect((server_ip, int(params[1])))
-                    print(server_ip)
-                    print(params[1])
-                    send_socket.send(returnState.encode())
-                count = count + 1   
+                    
+                count = count + 1
+            send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            print(server_ip)
+            print(params[1])                    
+            send_socket.connect((server_ip, int(params[1])))
+            print(server_ip)
+            print(params[1])
+            send_socket.send(returnState.encode())   
     #return nothing if nothing is found
     '''if not 
     notFound = "File not found"    

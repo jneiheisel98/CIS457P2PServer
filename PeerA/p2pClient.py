@@ -11,17 +11,19 @@ print ("\n Client is coming up. \n\n To use FTP, connect a client.")
 
 #basic server info
 client_ip = 'localhost'
-client_port = random.randint(3377,9999)
-sendRecv_port = random.randint(3377,9999)
-explore_port = random.randint(3377,9999)
+client_port = random.randint(3390,9999)
+sendRecv_port = random.randint(3390,9999)
+explore_port = random.randint(3390,9999)
 buffer_size = 1024
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sendRecv_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sendRecv_socket.bind((client_ip, sendRecv_port))
 sendRecv_socket.listen()
 explore_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-explore_socket.bind((client_ip, explore_port))
-explore_socket.listen()
+recv_socket =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+recv_socket.bind((client_ip, explore_port))
+recv_socket.listen()
+
 
 print("\nClient is up")
 def retr(fileName):
@@ -131,25 +133,36 @@ def get(otherIP, otherPort, fileName):
     time.sleep(4)
     sendState = "RETR "+ fileName + " " + str(client_ip) + " " + str(explore_port)
     explore_socket.send(sendState.encode())
-    
-    content = explore_socket.recv(buffer_size).decode()
+    extension = fileName.split(".")
+    filename = fileName
+    connected_socket, addr = recv_socket.accept()
+    content = connected_socket.recv(buffer_size)
     print(content)
     try:
         #final check
+        print("in final check")
         explore_socket.send("1")
         return
     except:
         print ("couldn't get final server confirmation")
     try:
         while content:
-            with open(filename, "a") as file:
-                file.write(str(content))
-                content = explore_socket.recv(buffer_size).decode('utf-8')
-                file.close()
+            if extension[1]== "jpg" or extension[1]== "png" or  extension[1]== "pdf" or extension[    1]== "mp4" or  extension[1]== "eps" or extension[1]== "ai" or extension[1]== "doc" or extension[1]== "docx" or extension[1]== "ppt" or extension[1]== "pptx":
+                with open(filename, "ab") as file:
+                    
+                    binCont = bytearray(content)
+                    file.write(binCont)
+                    content = connected_socket.recv(buffer_size)
+            else:
+                with open(filename, "a") as file:
+                    content = content.decode()
+                    file.write(content)
+                    content = connected_socket.recv(buffer_size)
+            file.close()
     except: 
         if not file.closed:
             file.close
-    explore_socket.close()
+    connected_socket.close()
         
 #automatic prompting menu for the client
 print("\nWelcome to the FTP Client. Call one of the following functions:")

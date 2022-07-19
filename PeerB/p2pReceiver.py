@@ -57,7 +57,7 @@ def retr(fileName, ip, port):
             send_socket.connect((ip, int(port)))
             print(ip)
             print(port)
-            client_socket.send(fileData)
+            send_socket.send(fileData)
         else: 
             print("sendOther")
             send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
